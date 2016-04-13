@@ -1,0 +1,3 @@
+include 'ui', 'info', 'restricted', 'gateway', 'as'
+rootProject.name = 'microverse'
+rootProject.children.each { it.name = rootProject.name + '-' + it.name }
