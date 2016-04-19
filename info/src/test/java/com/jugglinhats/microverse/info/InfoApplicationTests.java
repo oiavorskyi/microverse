@@ -11,11 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.Filter;
-
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,10 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration( InfoApplication.class )
 @WebAppConfiguration
 public class InfoApplicationTests {
-
-    @SuppressWarnings( "SpringJavaAutowiringInspection" )
-    @Autowired
-    private Filter springSecurityFilterChain;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -37,8 +31,7 @@ public class InfoApplicationTests {
     public void setUpMockMvc() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
-                .addFilters(springSecurityFilterChain)
-                .alwaysDo(print())
+                .apply(springSecurity())
                 .build();
     }
 
