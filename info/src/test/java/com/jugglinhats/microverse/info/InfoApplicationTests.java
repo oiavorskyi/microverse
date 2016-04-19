@@ -1,36 +1,52 @@
 package com.jugglinhats.microverse.info;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import javax.servlet.Filter;
+
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith( SpringJUnit4ClassRunner.class )
 @SpringApplicationConfiguration( InfoApplication.class )
-@WebIntegrationTest( randomPort = true )
+@WebAppConfiguration
 public class InfoApplicationTests {
 
-    @Value( "${local.server.port}" )
-    private int port;
+    @SuppressWarnings( "SpringJavaAutowiringInspection" )
+    @Autowired
+    private Filter springSecurityFilterChain;
 
-    private RestTemplate template = new TestRestTemplate();
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setUpMockMvc() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .alwaysDo(print())
+                .build();
+    }
 
     @Test
-    public void rejectsUnauthenticatedRequests() {
-        ResponseEntity<String> response = template.getForEntity
-                ("http://localhost:{port}/info/", String.class, port);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        String auth = response.getHeaders().getFirst("WWW-Authenticate");
-        assertTrue("Wrong header: " + auth, auth.startsWith("Bearer"));
+    public void rejectsUnauthenticatedRequests() throws Exception {
+        mockMvc.perform(get("info"))
+               .andExpect(status().isUnauthorized())
+               .andExpect(header().string("WWW-Authenticate", startsWith("Bearer")));
     }
 
 }
