@@ -1,5 +1,8 @@
 package com.jugglinhats.microverse.info;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.Singular;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -8,7 +11,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -26,19 +28,16 @@ import java.security.KeyPairGenerator;
 import java.security.Security;
 import java.util.*;
 
-import static java.util.Arrays.stream;
-import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toList;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
 
 public final class BearerTokenRequestPostProcessors {
 
     private static final KeyPair TRUSTED_KEYS = createSigningKey();
 
-    public static RequestPostProcessor bearerToken() {
+    public static RequestPostProcessor bearerToken(AuthTokenSpec spec) {
         return mockRequest -> {
-            final OAuth2Authentication auth = createAuthentication("oleg", "myservice",
-                    singleton("myscope"), singleton("info-service"), "myauthority");
-            OAuth2AccessToken token = createAccessToken(auth);
+            OAuth2AccessToken token = createAccessToken(spec.asAuthentication());
             mockRequest.addHeader("Authorization", "Bearer " + token.getValue());
             return mockRequest;
         };
@@ -78,35 +77,6 @@ public final class BearerTokenRequestPostProcessors {
         }
     }
 
-    private static OAuth2Authentication createAuthentication( String userId, String clientId,
-                                                              Set<String> scopes,
-                                                              Set<String> resourceIds,
-                                                              String... authorities ) {
-        final Collection<GrantedAuthority> authoritiesList =
-                stream(authorities)
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(toList());
-
-        // Default values for other parameters
-        final Map<String, String> requestParameters = Collections.emptyMap();
-        final boolean approved = true;
-        final String redirectUrl = null;
-        final Set<String> responseTypes = Collections.emptySet();
-        final Map<String, Serializable> extensionProperties = Collections.emptyMap();
-
-        // Create request
-        OAuth2Request oAuth2Request = new OAuth2Request(requestParameters, clientId,
-                authoritiesList, approved, scopes, resourceIds, redirectUrl, responseTypes,
-                extensionProperties);
-
-        // Create OAuth2AccessToken
-        User userPrincipal = new User(userId, "", true, true, true, true, authoritiesList);
-        UsernamePasswordAuthenticationToken authenticationToken = new
-                UsernamePasswordAuthenticationToken(userPrincipal, null, authoritiesList);
-        return new OAuth2Authentication(oAuth2Request, authenticationToken);
-    }
-
-
     public static class JwtPropertyInjector implements
             ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -128,6 +98,45 @@ public final class BearerTokenRequestPostProcessors {
             }
 
             env.getPropertySources().addFirst(new MapPropertySource("test-runtime", props));
+        }
+    }
+
+    @Builder( toBuilder = true )
+    @Data
+    public static class AuthTokenSpec {
+
+        private String      userId      = "default";
+        private String      clientId    = "default";
+        @Singular
+        private Set<String> scopes      = emptySet();
+        @Singular
+        private Set<String> resources   = emptySet();
+        @Singular
+        private Set<String> authorities = emptySet();
+
+        OAuth2Authentication asAuthentication() {
+            final Set<SimpleGrantedAuthority> authoritiesList =
+                    authorities.stream()
+                               .map(SimpleGrantedAuthority::new)
+                               .collect(toSet());
+
+            // Default values for other parameters
+            final Map<String, String> requestParameters = Collections.emptyMap();
+            final boolean approved = true;
+            final String redirectUrl = null;
+            final Set<String> responseTypes = Collections.emptySet();
+            final Map<String, Serializable> extensionProperties = Collections.emptyMap();
+
+            // Create request
+            OAuth2Request oAuth2Request = new OAuth2Request(requestParameters, clientId,
+                    authoritiesList, approved, scopes, resources, redirectUrl, responseTypes,
+                    extensionProperties);
+
+            // Create OAuth2AccessToken
+            User userPrincipal = new User(userId, "", true, true, true, true, authoritiesList);
+            UsernamePasswordAuthenticationToken authenticationToken = new
+                    UsernamePasswordAuthenticationToken(userPrincipal, null, authoritiesList);
+            return new OAuth2Authentication(oAuth2Request, authenticationToken);
         }
     }
 }

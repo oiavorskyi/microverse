@@ -1,5 +1,6 @@
 package com.jugglinhats.microverse.info;
 
+import com.jugglinhats.microverse.info.BearerTokenRequestPostProcessors.AuthTokenSpec;
 import com.jugglinhats.microverse.info.BearerTokenRequestPostProcessors.JwtPropertyInjector;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +15,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static com.jugglinhats.microverse.info.BearerTokenRequestPostProcessors.bearerToken;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
+        .springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -51,7 +53,14 @@ public class InfoApplicationTests {
 
     @Test
     public void acceptsAuthenticatedRequest() throws Exception {
-        mockMvc.perform(get("/info").with(bearerToken()))
+        final AuthTokenSpec token =
+                AuthTokenSpec.builder()
+                             .clientId("test-client")
+                             .userId("default")
+                             .resource("info-service")
+                             .build();
+
+        mockMvc.perform(get("/info").with(bearerToken(token)))
                .andExpect(status().isOk());
     }
 }
