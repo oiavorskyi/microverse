@@ -34,6 +34,16 @@ public final class BearerTokenRequestPostProcessors {
 
     private static final KeyPair TRUSTED_KEYS = createSigningKey();
 
+    public static RequestPostProcessor bearerToken() {
+        return mockRequest -> {
+            final OAuth2Authentication auth = createAuthentication("oleg", "myservice",
+                    singleton("myscope"), singleton("info-service"), "myauthority");
+            OAuth2AccessToken token = createAccessToken(auth);
+            mockRequest.addHeader("Authorization", "Bearer " + token.getValue());
+            return mockRequest;
+        };
+    }
+
     private static KeyPair createSigningKey() {
         Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyGen;
@@ -96,15 +106,6 @@ public final class BearerTokenRequestPostProcessors {
         return new OAuth2Authentication(oAuth2Request, authenticationToken);
     }
 
-    public static RequestPostProcessor bearerToken() {
-        return mockRequest -> {
-            final OAuth2Authentication auth = createAuthentication("oleg", "myservice",
-                    singleton("myscope"), singleton("myresource"), "myauthority");
-            OAuth2AccessToken token = createAccessToken(auth);
-            mockRequest.addHeader("Authorization", "Bearer " + token.getValue());
-            return mockRequest;
-        };
-    }
 
     public static class JwtPropertyInjector implements
             ApplicationContextInitializer<ConfigurableApplicationContext> {
