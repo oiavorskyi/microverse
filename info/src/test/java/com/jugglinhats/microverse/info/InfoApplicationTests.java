@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -29,6 +30,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class InfoApplicationTests {
 
+    @Value( "${security.oauth2.resource.id}" )
+    private String resourceId = "default";
+
+    private AuthTokenSpec defaultToken;
+    private AuthTokenSpec wrongResourceToken;
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -44,6 +51,23 @@ public class InfoApplicationTests {
 
     }
 
+    @Before
+    public void defineTokens() {
+        defaultToken = baseTokenBuilder()
+                .resource(resourceId)
+                .build();
+
+        wrongResourceToken = baseTokenBuilder()
+                .resource("wrong-resource")
+                .build();
+    }
+
+    private AuthTokenSpec.AuthTokenSpecBuilder baseTokenBuilder() {
+        return AuthTokenSpec.builder()
+                            .clientId("test-client")
+                            .userId("default");
+    }
+
     @Test
     public void rejectsUnauthenticatedRequest() throws Exception {
         mockMvc.perform(get("/info"))
@@ -53,14 +77,14 @@ public class InfoApplicationTests {
 
     @Test
     public void acceptsAuthenticatedRequest() throws Exception {
-        final AuthTokenSpec token =
-                AuthTokenSpec.builder()
-                             .clientId("test-client")
-                             .userId("default")
-                             .resource("info-service")
-                             .build();
-
-        mockMvc.perform(get("/info").with(bearerToken(token)))
+        mockMvc.perform(get("/info").with(bearerToken(defaultToken)))
                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void rejectsRequestsWithoutProperResourceId() throws Exception {
+        mockMvc.perform(get("/info").with(bearerToken(wrongResourceToken)))
+               .andExpect(status().isForbidden());
+
     }
 }
