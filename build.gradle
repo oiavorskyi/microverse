@@ -25,27 +25,23 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.RC2"
+        }
+    }
+
     dependencies {
-        compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-        testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+        compile "org.springframework.boot:spring-boot-starter-web"
+        compile "org.projectlombok:lombok"
+        testCompile "org.springframework.boot:spring-boot-starter-test"
+        testCompile "org.springframework.security:spring-security-test"
     }
 }
 
-//dependencies {
-//    compile('org.springframework.boot:spring-boot-starter-actuator')
-//    compile('org.springframework.cloud:spring-cloud-starter-oauth2')
-//    compile('org.springframework.cloud:spring-cloud-starter-security')
-//    compile('org.springframework.cloud:spring-cloud-starter')
-//    compile('org.springframework.boot:spring-boot-starter-data-redis')
-//    compile('org.projectlombok:lombok')
-//    compile('org.springframework.boot:spring-boot-starter-security')
-//    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-//    testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
-//    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
-//}
-
-//dependencyManagement {
-//imports {
-//mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.BUILD-SNAPSHOT"
-//}
-//}
+project(':microverse-info') {
+    dependencies {
+        compile("org.springframework.boot:spring-boot-starter-security")
+        compile("org.springframework.cloud:spring-cloud-starter-oauth2")
+    }
+}
