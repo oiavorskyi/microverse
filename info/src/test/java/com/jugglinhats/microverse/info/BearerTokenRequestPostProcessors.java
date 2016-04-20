@@ -34,10 +34,20 @@ import static java.util.stream.Collectors.toSet;
 public final class BearerTokenRequestPostProcessors {
 
     private static final KeyPair TRUSTED_KEYS = createSigningKey();
+    private static final KeyPair UNTRUSTED_KEYS = createSigningKey();
 
-    public static RequestPostProcessor bearerToken(AuthTokenSpec spec) {
+    public static RequestPostProcessor trustedBearerToken( AuthTokenSpec spec) {
+        return bearerToken(spec, TRUSTED_KEYS);
+    }
+
+    public static RequestPostProcessor untrustedBearerToken( AuthTokenSpec spec) {
+        return bearerToken(spec, UNTRUSTED_KEYS);
+    }
+
+    private static RequestPostProcessor bearerToken(
+            AuthTokenSpec spec, KeyPair keyPair ) {
         return mockRequest -> {
-            OAuth2AccessToken token = createAccessToken(spec.asAuthentication());
+            OAuth2AccessToken token = createAccessToken(spec.asAuthentication(), keyPair);
             mockRequest.addHeader("Authorization", "Bearer " + token.getValue());
             return mockRequest;
         };
@@ -56,14 +66,15 @@ public final class BearerTokenRequestPostProcessors {
         return keyGen.generateKeyPair();
     }
 
-    private static JwtAccessTokenConverter accessTokenConverter() throws Exception {
+    private static JwtAccessTokenConverter accessTokenConverter( KeyPair keyPair ) throws Exception {
         JwtAccessTokenConverter jwt = new JwtAccessTokenConverter();
-        jwt.setKeyPair(TRUSTED_KEYS);
+        jwt.setKeyPair(keyPair);
         jwt.afterPropertiesSet();
         return jwt;
     }
 
-    private static OAuth2AccessToken createAccessToken( final OAuth2Authentication auth ) {
+    private static OAuth2AccessToken createAccessToken( final OAuth2Authentication auth,
+                                                        KeyPair keyPair ) {
         DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(UUID.randomUUID().toString());
         int validitySeconds = 5;
         token.setExpiration(new Date(System.currentTimeMillis() + (validitySeconds * 1000L)));
@@ -71,7 +82,7 @@ public final class BearerTokenRequestPostProcessors {
         token.setScope(auth.getOAuth2Request().getScope());
 
         try {
-            return accessTokenConverter().enhance(token, auth);
+            return accessTokenConverter(keyPair).enhance(token, auth);
         } catch ( Exception e ) {
             throw new RuntimeException("Unable to create the JWT token converter", e);
         }

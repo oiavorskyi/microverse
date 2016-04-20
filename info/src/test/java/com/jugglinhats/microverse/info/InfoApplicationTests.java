@@ -14,7 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.jugglinhats.microverse.info.BearerTokenRequestPostProcessors.bearerToken;
+import static com.jugglinhats.microverse.info.BearerTokenRequestPostProcessors.trustedBearerToken;
+import static com.jugglinhats.microverse.info.BearerTokenRequestPostProcessors.untrustedBearerToken;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
         .springSecurity;
@@ -77,14 +78,19 @@ public class InfoApplicationTests {
 
     @Test
     public void acceptsAuthenticatedRequest() throws Exception {
-        mockMvc.perform(get("/info").with(bearerToken(defaultToken)))
+        mockMvc.perform(get("/info").with(trustedBearerToken(defaultToken)))
                .andExpect(status().isOk());
     }
 
     @Test
     public void rejectsRequestsWithoutProperResourceId() throws Exception {
-        mockMvc.perform(get("/info").with(bearerToken(wrongResourceToken)))
+        mockMvc.perform(get("/info").with(trustedBearerToken(wrongResourceToken)))
                .andExpect(status().isForbidden());
+    }
 
+    @Test
+    public void rejectsRequestsSignedByWrongKey() throws Exception {
+        mockMvc.perform(get("/info").with(untrustedBearerToken(defaultToken)))
+               .andExpect(status().isUnauthorized());
     }
 }
