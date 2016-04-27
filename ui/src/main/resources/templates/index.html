@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+	    <title>Microverse Portal</title>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</head>
+	<body>
+		<h1 th:text="|Hi ${username}! Welcome to Microverse|">Welcome to Microverse</h1>
+		<h2>What do you want to do?</h2>
+		<ul>
+			<li>
+				<a href="/open-info/">See open info</a>
+			</li>
+            <li>
+              <a href="/restricted-info/">See restricted info</a>
+            </li>
+		</ul>
+	</body>
+</html>
