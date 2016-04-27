@@ -34,14 +34,14 @@ subprojects {
     dependencies {
         compile "org.springframework.boot:spring-boot-starter-web"
         compile "org.projectlombok:lombok"
+        compile "org.springframework.cloud:spring-cloud-starter-oauth2"
         testCompile "org.springframework.boot:spring-boot-starter-test"
         testCompile "org.springframework.security:spring-security-test"
     }
 }
 
-project(':microverse-info') {
+project(":microverse-ui") {
     dependencies {
-        compile("org.springframework.boot:spring-boot-starter-security")
-        compile("org.springframework.cloud:spring-cloud-starter-oauth2")
+        compile "org.springframework.boot:spring-boot-starter-thymeleaf"
     }
 }
