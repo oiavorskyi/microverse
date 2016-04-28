@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.6.RELEASE"
     }
 }
 
@@ -20,7 +21,7 @@ subprojects {
     }
 
     apply plugin: 'java'
-    apply plugin: 'spring-boot'
+    apply plugin: "io.spring.dependency-management"
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -35,13 +36,30 @@ subprojects {
         compile "org.springframework.boot:spring-boot-starter-web"
         compile "org.projectlombok:lombok"
         compile "org.springframework.cloud:spring-cloud-starter-oauth2"
-        testCompile "org.springframework.boot:spring-boot-starter-test"
-        testCompile "org.springframework.security:spring-security-test"
+    }
+}
+
+configure([ project(':microverse-info'),
+            project(':microverse-restricted'),
+            project(':microverse-ui'),
+            project(':microverse-gateway') ]) {
+    apply plugin: 'spring-boot'
+
+    dependencies {
+        testCompile project(":microverse-test")
     }
 }
 
 project(":microverse-ui") {
     dependencies {
         compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+    }
+}
+
+project(":microverse-test") {
+    dependencies {
+        compile "org.springframework.boot:spring-boot-starter-test"
+        compile "org.springframework.security:spring-security-test"
+
     }
 }

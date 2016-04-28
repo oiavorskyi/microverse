@@ -11,10 +11,11 @@ import java.util.UUID;
 @RestController
 public class Controller {
 
-    @PreAuthorize("#oauth2.hasScope('info.read')")
+    @PreAuthorize("#oauth2.hasScope('microverse.info')")
     @RequestMapping( "/data" )
     public Map<String, Object> data() {
         Map<String, Object> model = new HashMap<>();
+        model.put("type", "open");
         model.put("id", UUID.randomUUID().toString());
         model.put("content", "Hello World");
         return model;
