@@ -27,13 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @ContextConfiguration( initializers = BaseSecurityTest.JwtKeyPropertyInjector.class )
 public abstract class BaseSecurityTest {
 
-    protected UaaJwtToken DEFAULT_TOKEN     = UaaJwtToken.builderWithDefaults()
-                                                         .scope("microverse.info")
-                                                         .build();
-    protected UaaJwtToken WRONG_SCOPE_TOKEN = UaaJwtToken.builderWithDefaults()
-                                                         .scope("microverse.wrong")
-                                                         .build();
-
     @Autowired
     protected WebApplicationContext webApplicationContext;
 

@@ -9,11 +9,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
-/**
- * Copies the model of UAA's JWT token
- *
- * @author wtran@pivotal.io
- */
 @Data
 @JsonInclude( Include.NON_NULL )
 @AllArgsConstructor( staticName = "newInstance", access = AccessLevel.PACKAGE )

@@ -1,6 +1,7 @@
 package com.jugglinhats.microverse.info;
 
 import com.jugglinhats.microverse.test.BaseSecurityTest;
+import com.jugglinhats.microverse.test.UaaJwtToken;
 import org.junit.Test;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 
@@ -11,6 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringApplicationConfiguration( classes = InfoApplication.class )
 public class InfoApplicationTests extends BaseSecurityTest {
+
+    private UaaJwtToken DEFAULT_TOKEN     = UaaJwtToken.builderWithDefaults()
+                                                       .scope("microverse.info")
+                                                       .build();
+    private UaaJwtToken WRONG_SCOPE_TOKEN = UaaJwtToken.builderWithDefaults()
+                                                       .scope("microverse.wrong")
+                                                       .build();
 
     @Test
     public void rejectsUnauthenticatedRequest() throws Exception {
