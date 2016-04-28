@@ -1,0 +1,11 @@
+logging:
+  level:
+    org.springframework.security: DEBUG
+security:
+  oauth2:
+    resource:
+      id: microverse
+      jwt:
+        key-uri: http://localhost:8080/uaa/token_key
+server:
+  port: 8081

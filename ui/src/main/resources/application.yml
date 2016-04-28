@@ -1,0 +1,18 @@
+server:
+  port: 8088
+security:
+  basic:
+    enabled: false
+  oauth2:
+    client:
+      access-token-uri: http://localhost:8085/uaa/oauth/token
+      user-authorization-uri: http://localhost:8085/uaa/oauth/authorize
+      client-id: ui-portal
+      client-secret: secret
+      scope: openid,microverse.info,microverse.restricted
+    resource:
+      jwt:
+        key-uri: http://localhost:8085/uaa/token_key
+logging:
+  level:
+    org.springframework.security: DEBUG
