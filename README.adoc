@@ -1,0 +1,5 @@
+The reference architecture for microservices with Spring Boot and Spring Cloud
+
+Based on the https://github.com/william-tran/microservice-security[sample] created by William
+Tran
+
