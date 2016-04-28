@@ -1,0 +1,22 @@
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+security:
+  basic:
+    enabled: false
+
+zuul:
+  routes:
+    uaa:
+      path: /uaa/**
+      url: http://localhost:8080/uaa/
+    info:
+      path: /open-info/**
+      url: http://localhost:8081/data
+    restricted:
+      path: /restricted-info/**
+      url: http://localhost:8082/data
+
+server:
+  port: 8085

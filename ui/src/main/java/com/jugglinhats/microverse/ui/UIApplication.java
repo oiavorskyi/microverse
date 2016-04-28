@@ -37,7 +37,7 @@ public class UIApplication {
     @RequestMapping( "/open-info" )
     public String openInfo( Model model ) {
         final ResponseEntity<Info> info = restTemplate.getForEntity
-                ("http://localhost:8081/data", Info.class);
+                ("http://localhost:8085/open-info", Info.class);
         model.addAttribute("info", info.getBody());
         return "info";
     }
@@ -45,7 +45,7 @@ public class UIApplication {
     @RequestMapping( "/restricted-info" )
     public String restrictedInfo( Model model ) {
         final ResponseEntity<Info> info = restTemplate.getForEntity
-                ("http://localhost:8082/data", Info.class);
+                ("http://localhost:8085/restricted-info", Info.class);
         model.addAttribute("info", info.getBody());
         return "info";
     }

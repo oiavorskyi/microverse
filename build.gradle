@@ -56,6 +56,13 @@ project(":microverse-ui") {
     }
 }
 
+project(":microverse-gateway") {
+    dependencies {
+        compile "org.springframework.cloud:spring-cloud-starter-zuul"
+    }
+
+}
+
 project(":microverse-test") {
     dependencies {
         compile "org.springframework.boot:spring-boot-starter-test"
