@@ -1,6 +1,5 @@
-package com.jugglinhats.microverse.info;
+package com.jugglinhats.microverse.restricted;
 
-import com.jugglinhats.microverse.restricted.RestrictedApplication;
 import com.jugglinhats.microverse.test.BaseSecurityTest;
 import com.jugglinhats.microverse.test.UaaJwtToken;
 import org.junit.Test;

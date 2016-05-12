@@ -14,7 +14,6 @@ oauth:
       authorized-grant-types: authorization_code
       scope: openid,microverse.restricted,microverse.info
       authorities: uaa.resource
-      redirect-uri: http://localhost:8081/login
 
 scim:
   users:
